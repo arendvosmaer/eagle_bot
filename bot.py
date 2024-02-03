@@ -8,7 +8,7 @@ from lunarlander import Instructions
 
 
 def rotate(current: float, target: float) -> Union[Literal["left", "right"], None]:
-    if abs(current - target) < 0.5:
+    if abs(current - target) < 0.1:
         return
     return "left" if current < target else "right"
 
