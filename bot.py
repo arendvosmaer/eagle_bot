@@ -33,17 +33,17 @@ def find_landing_site(terrain: np.ndarray) -> Union[int, None]:
     # Return location if large enough
     if (end - start) > 40:
         loc = int(start + (end - start) * 0.5)
-        print("Found landing site at", loc)
+        # print("Found landing site at", loc)
         return loc
 
 def should_stop(target, current) -> bool:
     d = target - current
     if d < 0:
         d += 1920
-    print("distance to target", d)
+    # print("distance to target", d)
     m = 2
     if abs(254-d) < m:
-        print("should stop", d, current, target)
+        # print("should stop", d, current, target)
         return True
     return False
 
@@ -76,6 +76,7 @@ class Bot:
         self.done_x = 0
         self.stopping_distance = 254
         self.braking_zone = 0
+        print("Prepare for boarding")
 
     def run(
         self,
@@ -120,7 +121,7 @@ class Bot:
             else:
                 self.initial_manoeuvre = False
                 self.done_x = x
-                print("Straightened at x", x, "y", y, "vx", vx, "vy", vy, "head", head)
+                # print("Straightened at x", x, "y", y, "vx", vx, "vy", vy, "head", head)
             return instructions
         
 
@@ -128,7 +129,7 @@ class Bot:
         if self.target_site is None:
             self.target_site = find_landing_site(terrain)
         elif not self.stopped and not self.stopping and should_stop(self.target_site, x):
-            print("Stopping at target site", self.target_site, "x:", x, "distance:", x - self.done_x)
+            # print("Stopping at target site", self.target_site, "x:", x, "distance:", x - self.done_x)
             self.stopping = True
 
         if self.stopping:
@@ -147,8 +148,8 @@ class Bot:
             else:
                 self.stopped = True
                 self.stopping = False
-                print("Stopped at x:", x, "target:", self.target_site, "distance:", x - self.done_x)
-                print("Stopping distance:", x - self.done_x)
+                # print("Stopped at x:", x, "target:", self.target_site, "distance:", x - self.done_x)
+                # print("Stopping distance:", x - self.done_x)
 
         if self.stopped:
             slow_done_please = False
@@ -163,13 +164,13 @@ class Bot:
             else:
                 current_height = y - terrain[self.target_site]
                 slow_done_please = current_height < self.braking_zone
-                print("current height", current_height, "braking zone", self.braking_zone, "should stop", slow_done_please)
+                # print("current height", current_height, "braking zone", self.braking_zone, "should stop", slow_done_please)
                 if not slow_done_please:
-                    print("falling down")
+                    # print("falling down")
                     instructions.main = False
                     return instructions
                 elif vy < -4.5:
-                    print("firing to land")
+                    # print("firing to land")
                     instructions.main = True
                 return instructions
 
@@ -177,7 +178,7 @@ class Bot:
         #     print("firing to land")
         #     instructions.main = True
         elif straight_enough(head) and vy < 0:
-            print("firing to hover")
+            # print("firing to hover")
             instructions.main = True
        
 
