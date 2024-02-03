@@ -48,6 +48,7 @@ class Bot:
         self.flag = "nl"  # Optional attribute
         self.initial_manoeuvre = True
         self.target_site = None
+        self.brake_altitude = None
 
     def run(
         self,
@@ -82,6 +83,8 @@ class Bot:
         vx, vy = me.velocity
         head = me.heading
 
+        thrust = -1.62 * 3
+
         # Perform an initial rotation to get the LEM pointing upwards
         if self.initial_manoeuvre:
             if vx > 10:
@@ -97,11 +100,11 @@ class Bot:
             return instructions
 
         # Search for a suitable landing site
-        # if self.target_site is None:
-        #     self.target_site = find_landing_site(terrain)
+        if self.target_site is None:
+            self.target_site = find_landing_site(terrain)
 
-        # If no landing site had been found, just hover at 900 altitude.
-        if (self.target_site is None) and (y < 1100) and (vy < 10):
+        # If no landing site had been found, just hover when below 900 altitude.
+        if (self.target_site is None) and (y < 900) and (vy < 10):
             instructions.main = True
 
         if self.target_site is not None:
@@ -123,8 +126,20 @@ class Bot:
                 elif command == "right":
                     instructions.right = True
 
-                if (abs(vx) < 0.5) and (vy < -3):
+                # once horizontally aligned,
+                # set brake altitude to 1/3 of vertial distance to target
+                if self.brake_altitude is None:
+                    target_y = terrain[self.target_site]
+                    self.brake_altitude = y - (y - target_y) / 4
+
+                print("Brake altitude:", self.brake_altitude, "y:", y, "vy:", vy, "vx:", vx, "head:", head)
+
+                if (abs(vx) < 0.5) and (vy <= -4.5):
                     instructions.main = True
+
+                if y > self.brake_altitude and abs(head) < 1:
+                    instructions.main = False
+
             else:
                 # Stay at constant altitude while moving towards target
                 if vy < 0:
