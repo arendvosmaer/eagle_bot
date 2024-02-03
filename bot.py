@@ -154,7 +154,14 @@ class Bot:
         if self.stopped:
             slow_done_please = False
             if self.braking_zone == 0: self.braking_zone = (y- terrain[self.target_site]) // 2
-            command = rotate(current=head, target=0)
+            dist_from_target = self.target_site - x
+            target = 0
+            if abs(dist_from_target) > 5:
+                if dist_from_target < 0:
+                    target = 1
+                if dist_from_target > 0:
+                    target = -1
+            command = rotate(current=head, target=target)
             if command == "left":
                 instructions.left = True
                 return instructions
